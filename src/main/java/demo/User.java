@@ -6,8 +6,12 @@ import java.util.List;
 
 
 public class User {
-    public User (){
+    public User (){ }
 
+    public User (String name,int age) {
+        this.name = name;
+        if (age>= 0)
+            this.age = age;
     }
 
     private String name;
@@ -100,5 +104,20 @@ public class User {
             return false;
         }
     }
+
+    public boolean isMemberInYear(int year) {
+        return membershipYears != null && membershipYears.contains(year);
+    }
+
+    // public boolean equals (User otherUser) {
+    //     if (this.getName().equals(otherUser.getName()) && this.getAge() == otherUser.getAge() && this.getEmail().equals(otherUser.getEmail())) {
+    //         return true;
+    //     }
+    //     return false;
+
+    // }
+    
+
+    
 
 }
