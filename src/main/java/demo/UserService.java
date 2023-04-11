@@ -4,34 +4,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
     public UserService () {
-    User user1 = new User("Elke", 44, "elke@ucll.be", "rzeze");
-    User user2 = new User("John", 25, "john@ucll.be", "password123");
-    User user3 = new User("Alice", 35, "alice@ucll.be", "qwerty");
+    // User user1 = new User("Elke", 44, "elke@ucll.be", "rzeze");
+    // User user2 = new User("John", 25, "john@ucll.be", "password123");
+    // User user3 = new User("Alice", 35, "alice@ucll.be", "qwerty");
 
-    userRepository.add(user1);
-    userRepository.add(user2); 
-    userRepository.add(user3);
-    user1.addMembershipYear(2000);
-    user1.addMembershipYear(2010);
-    user2.addMembershipYear(2010);
-    user3.addMembershipYear(1999);
+    // userRepository.add(user1);
+    // userRepository.add(user2); 
+    // userRepository.add(user3);
+    // user1.addMembershipYear(2000);
+    // user1.addMembershipYear(2010);
+    // user2.addMembershipYear(2010);
+    // user3.addMembershipYear(1999);
     }
     
-    
-    private List<User> userRepository = new ArrayList<>();
+    @Autowired
+    private UserRepository userRepository;
 
 
     public List<User> getAllUsers() {
-        return userRepository;
+        return userRepository.findAll();
     }
 
     public List<User> getUsersWithAgeOlderThan(int age) {
-        return userRepository.stream().filter(user -> user.getAge()>age).toList();
+        return userRepository.findUsersByAgeAfter(age);
     }
 
     public User getOldestUser() {
@@ -51,19 +52,14 @@ public class UserService {
     }
 
     public boolean addUser(User user) {
-        for (User user1 : userRepository) {
-            if (user.getEmail() == user1.getEmail()) {
-                return false;
-            }
-        }
-        return userRepository.add(user);
+        if (getUserWithEmail(user.getEmail()) != null)
+            return false;
+        userRepository.save(user);
+        return true;
     }
 
     public User getUserWithEmail (String email) {
-        Optional<User> userOptional = userRepository.stream()
-        .filter(user -> user.getEmail().equals(email))
-        .findFirst();
-        return userOptional.orElse(null);
+        return userRepository.findUserByEmail(email);
     }
 
 

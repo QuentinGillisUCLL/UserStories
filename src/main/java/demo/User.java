@@ -3,10 +3,21 @@ package demo;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.annotation.Transient;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name="users")
 public class User {
-    public User (){ }
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    @Id
+    public long id;
+    public User (){}
 
     public User (String name,int age) {
         this.name = name;
@@ -18,6 +29,7 @@ public class User {
     private int age;
     private String email;
     private String password;
+    @Transient
     private List<Integer> membershipYears = new ArrayList<Integer>();
 
     public User(String name, int age,String email, String password) {
