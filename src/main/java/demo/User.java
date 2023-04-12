@@ -80,6 +80,10 @@ public class User {
         return "@$-"+password+"&%#";
     }
 
+    public List<Integer> getMembershipYears () {
+        return membershipYears;
+    }
+
     public int getFirstMembershipYear () {
         int oldest = 3000;
         if (membershipYears.size()> 0) {

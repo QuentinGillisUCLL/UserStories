@@ -2,10 +2,11 @@ package demo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
@@ -14,9 +15,9 @@ public class UserService {
     // User user2 = new User("John", 25, "john@ucll.be", "password123");
     // User user3 = new User("Alice", 35, "alice@ucll.be", "qwerty");
 
-    // userRepository.add(user1);
-    // userRepository.add(user2); 
-    // userRepository.add(user3);
+    // userRepository.save(user1);
+    // userRepository.save(user2); 
+    // userRepository.save(user3);
     // user1.addMembershipYear(2000);
     // user1.addMembershipYear(2010);
     // user2.addMembershipYear(2010);
@@ -25,6 +26,8 @@ public class UserService {
     
     @Autowired
     private UserRepository userRepository;
+
+    
 
 
     public List<User> getAllUsers() {
@@ -37,18 +40,23 @@ public class UserService {
 
     public User getOldestUser() {
         User oldest = null;
-        if (userRepository.size()>0) {
-            oldest = userRepository.get(0);
-            for (User user : userRepository) {
-                if (user.getAge() > oldest.getAge())
-                    oldest = user;
-            }
+        List<User> users = userRepository.findAllByOrderByAgeDesc();
+        if (users != null && !users.isEmpty()) {
+            oldest = users.get(0);
         }
         return oldest;
     }
 
+
     public User getUserWithName(String name) {
-        return userRepository.stream().filter(user -> user.getName().equals(name)).toList().get(0);
+        for (User user : userRepository.findAll()) {
+            if (user.getEmail() == name) {
+                userRepository.delete(user);
+                return user;
+            }
+        }
+        return null;
+        // return userRepository.stream().filter(user -> user.getName().equals(name)).toList().get(0);
     }
 
     public boolean addUser(User user) {
@@ -63,28 +71,50 @@ public class UserService {
     }
 
 
-    public User removeUser (String string) {
-        for (User user : userRepository) {
-            if (user.getEmail() == string) {
-                userRepository.remove(user);
-                return user;
-            }
-        }
-        return null;
-    }
+    @Transactional
+    public User removeUser(String email){
+        User user = getUserWithEmail(email);
+        if (user == null){
+            return null;
+  }
+    userRepository.deleteByEmail(email);
+    return user;
+}
 
     
     public List<User> getAllUsersInYear (int year) {
-        return userRepository.stream().filter(user -> user.isMemberInYear(year)).toList();
-    }
+        List <User> newlist  = new ArrayList <>();
+        for (User user : userRepository.findAll()) {
+            if(user.getMembershipYears().contains(year)) {
+                newlist.add(user);
+                
+
+            }}
+        return newlist;
+        }
+        // return userRepository.stream().filter(user -> user.isMemberInYear(year)).toList();
+    
 
     public List<User> getUserWithEmailAndAge(String email, int age) {
-        return userRepository.stream().filter(user -> user.getAge() == age && user.getEmail().equals(email)).toList();
+        List <User> newlist  = new ArrayList <>();
+        for (User user : userRepository.findAll()) {
+            if(user.getEmail().equals(email) && user.getAge() == age) {
+                newlist.add(user);
+            }}
+        return newlist;
+        // return userRepository.stream().filter(user -> user.getAge() == age && user.getEmail().equals(email)).toList();
         
 
     }
     public List<User> getUsersWithAgeBetween(int min, int max) {
-        return userRepository.stream().filter(user -> user.getAge()>=min && user.getAge()<=max).toList();
+        List<User> filteredUsers = new ArrayList<>();
+        for (User user : userRepository.findAll()) {
+            if (user.getAge() >= min && user.getAge() <= max) {
+                filteredUsers.add(user);
+            }
+            
+        }
+        return filteredUsers;
     }
 
 }
