@@ -11,6 +11,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import jakarta.validation.constraints.*;
+
 @Entity
 @Table(name="users")
 public class User {
@@ -24,10 +26,14 @@ public class User {
         if (age>= 0)
             this.age = age;
     }
-
+    @NotBlank(message="name may not be empty")
     private String name;
+    @Positive(message = "age may not be negative")
     private int age;
+    @Email(message = "no valid email")
     private String email;
+    @Pattern(regexp = "^(?=\\S+$).{8,}$", message = "password must be minimum 8 characters and may not contain white spaces")
+    
     private String password;
     @Transient
     private List<Integer> membershipYears = new ArrayList<Integer>();
@@ -77,7 +83,7 @@ public class User {
             return "@$-t&%#";
             
         
-        return "@$-"+password+"&%#";
+        return password;
     }
 
     public List<Integer> getMembershipYears () {

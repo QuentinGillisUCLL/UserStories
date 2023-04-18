@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+import demo.ServiceException;
 
 @Service
 public class UserService {
@@ -59,11 +60,11 @@ public class UserService {
         // return userRepository.stream().filter(user -> user.getName().equals(name)).toList().get(0);
     }
 
-    public boolean addUser(User user) {
+    public User addUser(User user) throws ServiceException {
         if (getUserWithEmail(user.getEmail()) != null)
-            return false;
+            return null;
         userRepository.save(user);
-        return true;
+        return user;
     }
 
     public User getUserWithEmail (String email) {
