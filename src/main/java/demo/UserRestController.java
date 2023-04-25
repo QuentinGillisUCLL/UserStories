@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/users")
 public class UserRestController {
     @PostMapping()
-    public boolean addUser(@RequestBody User user) {
-    return userService.addUser (user);
+    public boolean addUser(@RequestBody User user) throws ServiceException {
+    return userService.addUser(user) == null ? false : true;
     }
     @DeleteMapping("/{email}")
-    public User deleteUser (@PathVariable("email") String email) {
+    public User deleteUser (@PathVariable("email") String email) throws ServiceException {
         return userService.removeUser(email);
     }
 
@@ -35,12 +35,12 @@ public class UserRestController {
     }
 
     @GetMapping("/oldest")
-    public User getOldestUser() {
+    public User getOldestUser() throws ServiceException {
         return userService.getOldestUser();
     }
 
     @GetMapping("/search/olderthan")
-    public List<User> searchUsersWithAgeOlderThan(@RequestParam("age") int age) {
+    public List<User> searchUsersWithAgeOlderThan(@RequestParam("age") int age) throws ServiceException {
         return userService.getUsersWithAgeOlderThan(age);
     }
 
@@ -50,12 +50,12 @@ public class UserRestController {
     }
 
     @GetMapping("/adults")
-    public List<User> getAllAdults () {
+    public List<User> getAllAdults ()throws ServiceException {
         return userService.getUsersWithAgeOlderThan(17);
     }
 
     @GetMapping("/search/email/{email}")
-    public User getUserWithEmail (@PathVariable("email")String email) {
+    public User getUserWithEmail (@PathVariable("email")String email) throws ServiceException {
         return userService.getUserWithEmail(email);
 
     }

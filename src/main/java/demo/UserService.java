@@ -35,15 +35,22 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public List<User> getUsersWithAgeOlderThan(int age) {
+    public List<User> getUsersWithAgeOlderThan(int age) throws ServiceException {
+        List <User> users = userRepository.findUsersByAgeAfter(age);
+        if (users.size() == 0) {
+            throw new ServiceException("users", "no users with age " +age+ " found");
+        }
         return userRepository.findUsersByAgeAfter(age);
     }
 
-    public User getOldestUser() {
+    public User getOldestUser() throws ServiceException {
         User oldest = null;
         List<User> users = userRepository.findAllByOrderByAgeDesc();
         if (users != null && !users.isEmpty()) {
             oldest = users.get(0);
+        }
+        else {
+            throw new ServiceException("users", "no oldest user found");
         }
         return oldest;
     }
@@ -61,26 +68,38 @@ public class UserService {
     }
 
     public User addUser(User user) throws ServiceException {
-        if (getUserWithEmail(user.getEmail()) != null)
-            return null;
-        userRepository.save(user);
-        return user;
+        try {
+            getUserWithEmail(user.getEmail());
+        } catch (ServiceException e) {
+            userRepository.save(user);
+            return user;
+        }
+        throw new ServiceException("email", "email already taken");
     }
 
-    public User getUserWithEmail (String email) {
-        return userRepository.findUserByEmail(email);
+    public User getUserWithEmail (String email) throws ServiceException {
+    User user = userRepository.findUserByEmail(email);
+    if (user == null) {
+        throw new ServiceException("user", "no user found with email: "+ email);
+    }
+    else {
+        return user;
+    }
     }
 
 
     @Transactional
-    public User removeUser(String email){
-        User user = getUserWithEmail(email);
-        if (user == null){
-            return null;
-  }
-    userRepository.deleteByEmail(email);
-    return user;
-}
+    public User removeUser(String email) throws ServiceException{
+        try {
+            User foundUser = getUserWithEmail(email);
+
+            if (foundUser != null)
+                userRepository.delete(foundUser);
+            return foundUser;
+        } catch (ServiceException e) {
+            throw new ServiceException("user", "user with this email does not exist");
+        }
+    }
 
     
     public List<User> getAllUsersInYear (int year) {

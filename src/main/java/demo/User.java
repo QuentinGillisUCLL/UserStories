@@ -3,6 +3,7 @@ package demo;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.Parameter;
 import org.springframework.data.annotation.Transient;
 
 import jakarta.persistence.Entity;
@@ -32,8 +33,9 @@ public class User {
     private int age;
     @Email(message = "no valid email")
     private String email;
+
     @Pattern(regexp = "^(?=\\S+$).{8,}$", message = "password must be minimum 8 characters and may not contain white spaces")
-    
+    @Pattern(regexp = ".*\\d.*", message = "password must contain a digit")
     private String password;
     @Transient
     private List<Integer> membershipYears = new ArrayList<Integer>();
